@@ -1,7 +1,5 @@
 // ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
 import 'package:flutter/material.dart';
-import 'package:password_manager/Model/password_model.dart';
-import 'constants.dart';
 
 class AddModal extends StatefulWidget {
   final Function(String, String, String) onAddPassword;
@@ -78,28 +76,24 @@ class _AddModalState extends State<AddModal> {
                 style: ButtonStyle(
                   elevation: MaterialStateProperty.all(5),
                   shadowColor:
-                      MaterialStateProperty.all(Constants.buttonBackground),
+                      MaterialStateProperty.all(
+                      Color.fromARGB(255, 55, 114, 255)),
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24.0),
-                      side: BorderSide(color: Constants.buttonBackground),
+                      side: BorderSide(color: Color.fromARGB(255, 55, 114, 255)),
                     ),
                   ),
                   backgroundColor:
-                      MaterialStateProperty.all(Constants.buttonBackground),
+                      MaterialStateProperty.all(
+                      Color.fromARGB(255, 55, 114, 255)),
                 ),
                 onPressed: () async {
                   final username = usernameController.text;
                   final description = descriptionController.text;
                   final password = passwordController.text;
 
-                  Constants.passwordData.add(
-                    passwords(
-                      userName: username,
-                      description: description,
-                      password: password,
-                    ),
-                  );
+                  
 
                   widget.onAddPassword(username, description, password);
                   Navigator.pop(context);
@@ -111,7 +105,7 @@ class _AddModalState extends State<AddModal> {
               ),
             ),
             SizedBox(
-              height: 20,
+              height: 270,
             ),
             SizedBox(
               height: 30,
@@ -136,14 +130,14 @@ class _AddModalState extends State<AddModal> {
               padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
               child: Icon(
                 icon,
-                color: Constants.searchGrey,
+                color: Color.fromARGB(255, 82, 101, 120),
               ),
             ),
             filled: true,
             contentPadding: EdgeInsets.all(16),
             hintText: hintText,
             hintStyle: TextStyle(
-                color: Constants.searchGrey, fontWeight: FontWeight.w500),
+                color: Color.fromARGB(255, 82, 101, 120), fontWeight: FontWeight.w500),
             fillColor: Color.fromARGB(247, 232, 235, 237),
             border: OutlineInputBorder(
                 borderSide: BorderSide(

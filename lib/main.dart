@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:password_manager/AddModal.dart';
 import 'package:password_manager/DatabaseHelper.dart';
 import 'package:password_manager/Model/password_model.dart';
-import 'package:password_manager/constants.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +32,7 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
       ),
       home: HomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -93,34 +93,45 @@ class _HomePageState extends State<HomePage> {
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
           onPressed: () => bottomModal(context),
-          backgroundColor: Constants.fabBackground,
+          backgroundColor: Color.fromARGB(255, 55, 114, 255),
           child: Icon(Icons.add),
         ),
         body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 0, 8, 0),
-            child: Column(
-              children: [
-                SizedBox(height: 15),
-                headingText("Saved Passwords"),
-                SizedBox(
-                  height: 10,
-                ),
-                passwordData.isEmpty
-                    ? Center(heightFactor: 15,
-                        child: Text(
-                          "There isn't any entry available",
-                          style: TextStyle(fontSize: 20,color: Colors.redAccent),
-                        ))
-                    : ListView.builder(
+          child: Column(
+            children: [
+              SizedBox(height: 15),
+              headingText("Passwords Manager"),
+              Divider(
+                color: Colors.blueAccent,
+                height: 30,
+                thickness: 2,
+              ),
+              passwordData.isEmpty
+                  ? Center(
+                      heightFactor: 20,
+                      child: Text(
+                        "There isn't any entry available",
+                        style:
+                            TextStyle(fontSize: 20, color: Colors.blueAccent),
+                      ))
+                  : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListView.builder(
                         shrinkWrap: true,
-                        itemCount: passwordData.length,
+                        itemCount: passwordData.length * 2 - 1,
                         itemBuilder: (context, index) {
-                          final password = passwordData[index];
+                          if (index.isOdd) {
+                            return Divider(
+                                height: 1, thickness: 1, color: Colors.black);
+                          }
+
+                          final passwordIndex = index ~/ 2;
+                          final password = passwordData[passwordIndex];
+
                           return Dismissible(
                             key: Key(password.userName),
                             onDismissed: (direction) {
-                              deletePassword(index);
+                              deletePassword(passwordIndex);
                             },
                             background: Container(
                               color: Colors.red,
@@ -133,14 +144,15 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
                             ),
-                            child: passwordTile(password, index, context, () {
-                              deletePassword(index);
+                            child: passwordTile(
+                                password, passwordIndex, context, () {
+                              deletePassword(passwordIndex);
                             }),
                           );
                         },
                       ),
-              ],
-            ),
+                    )
+            ],
           ),
         ),
       ),
