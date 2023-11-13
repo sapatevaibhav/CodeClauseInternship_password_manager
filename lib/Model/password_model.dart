@@ -14,12 +14,12 @@ class passwords {
   passwords copyWith({
     String? userName,
     String? description,
-    String? password, // Add the 'password' field here
+    String? password,
   }) {
     return passwords(
       userName: userName ?? this.userName,
       description: description ?? this.description,
-      password: password ?? this.password, // Include the 'password' field
+      password: password ?? this.password,
     );
   }
 
@@ -27,7 +27,7 @@ class passwords {
     return <String, dynamic>{
       'userName': userName,
       'description': description,
-      'password': password, // Include the 'password' field
+      'password': password,
     };
   }
 
@@ -35,7 +35,7 @@ class passwords {
     return passwords(
       userName: map['userName'] as String,
       description: map['description'] as String,
-      password: map['password'] as String, // Include the 'password' field
+      password: map['password'] as String,
     );
   }
 

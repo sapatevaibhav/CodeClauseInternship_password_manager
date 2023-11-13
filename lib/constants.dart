@@ -31,9 +31,9 @@ class Constants {
         description: "Netflix Personal",
         password: '!ihw4h34nr4i3'),
     passwords(
-      userName: "abc22", 
-      description: "X main account",
-       password: '8dwy8*87&'),
+        userName: "abc22",
+        description: "X main account",
+        password: '8dwy8*87&'),
     passwords(
         userName: "ProUser",
         description: "Dribbble",

@@ -1,21 +1,30 @@
 // ignore_for_file: prefer_const_constructors, unnecessary_new, prefer_const_literals_to_create_immutables
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:password_manager/AddModal.dart';
+import 'package:password_manager/DatabaseHelper.dart';
 import 'package:password_manager/Model/password_model.dart';
 import 'package:password_manager/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  static final GlobalKey<_HomePageState> homePageKey = _homePageKey;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+
+  static void refreshHomePage() {
+    _homePageKey.currentState?.refresh();
+  }
+}
+
+final GlobalKey<_HomePageState> _homePageKey = GlobalKey<_HomePageState>();
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,44 +46,33 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<passwords> passwordData = [];
+  DatabaseHelper dbHelper = DatabaseHelper();
 
-  @override
+  void refresh() {
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
     loadPasswordData();
   }
 
+  Future<void> loadPasswordData() async {
+    final List<passwords> loadedData = await dbHelper.getPasswords();
+    setState(() {
+      passwordData = loadedData;
+    });
+  }
+
   @override
   void dispose() {
-    savePasswordData();
     super.dispose();
   }
 
-  Future<void> loadPasswordData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonData = prefs.getString('passwordData');
-
-    if (jsonData != null) {
-      final Iterable decoded = jsonDecode(jsonData);
-      List<passwords> loadedData =
-          decoded.map((e) => passwords.fromMap(e)).toList();
-
-      setState(() {
-        passwordData = loadedData;
-      });
-    }
-  }
-
-  Future<void> savePasswordData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonData = jsonEncode(passwordData);
-    await prefs.setString('passwordData', jsonData);
-  }
-
-  // Add a function to delete a password
-  void deletePassword(int index) {
+  Future<void> deletePassword(int index) async {
     if (index >= 0 && index < passwordData.length) {
+      await dbHelper.deletePassword(passwordData[index].userName);
       setState(() {
         passwordData.removeAt(index);
       });
@@ -82,6 +80,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void addPassword(passwords password) {
+    dbHelper.insertPassword(password);
     setState(() {
       passwordData.add(password);
     });
@@ -91,72 +90,47 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
           onPressed: () => bottomModal(context),
           backgroundColor: Constants.fabBackground,
           child: Icon(Icons.add),
         ),
-        bottomNavigationBar: BottomAppBar(
-            shape: const CircularNotchedRectangle(),
-            notchMargin: 10,
-            child: SizedBox(
-                height: 60,
-                child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      SvgPicture.asset("assets/4square.svg"),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      SvgPicture.asset("assets/shield.svg")
-                    ]))),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(8.0, 0, 8, 0),
             child: Column(
               children: [
-                searchText("Search Password"),
+                SizedBox(height: 15),
+                headingText("Saved Passwords"),
                 SizedBox(
                   height: 10,
                 ),
-                HeadingText("Recently Used"),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  // height: 200,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: Constants.passwordData.length,
-                    itemBuilder: (context, index) {
-                      final password = Constants.passwordData[index];
-                      return Dismissible(
-                        key: Key(password
-                            .userName), // Provide a unique key for each item
-                        onDismissed: (direction) {
-                          // Implement the logic to delete the corresponding password here
-                          deletePassword(index);
-                        },
-                        background: Container(
-                          color: Colors
-                              .red, // Background color when swiping to delete
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Icon(Icons.arrow_back, color: Colors.white),
-                              Icon(Icons.delete, color: Colors.white),
-                            ],
-                          ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: passwordData.length,
+                  itemBuilder: (context, index) {
+                    final password = passwordData[index];
+                    return Dismissible(
+                      key: Key(password.userName),
+                      onDismissed: (direction) {
+                        deletePassword(index);
+                      },
+                      background: Container(
+                        color: Colors.red,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(Icons.arrow_back, color: Colors.white),
+                            Icon(Icons.delete, color: Colors.white),
+                          ],
                         ),
-
-                        child: PasswordTile(password, index, context, () {
-                          deletePassword(index);
-                        }),
-                      );
-                    },
-                  ),
+                      ),
+                      child: passwordTile(password, index, context, () {
+                        deletePassword(index);
+                      }),
+                    );
+                  },
                 ),
               ],
             ),
@@ -166,7 +140,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget PasswordTile(
+  Widget passwordTile(
     passwords password,
     int index,
     BuildContext context,
@@ -175,10 +149,10 @@ class _HomePageState extends State<HomePage> {
     return Dismissible(
       key: Key(password.userName),
       onDismissed: (direction) {
-        onDelete(); // Call the onDelete function to delete this password
+        onDelete();
       },
       background: Container(
-        color: Colors.red, // Background color when swiping to delete
+        color: Colors.red,
         alignment: Alignment.centerRight,
         padding: EdgeInsets.only(right: 20),
         child: Row(
@@ -186,9 +160,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             IconButton(
               icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                // Handle the action when swiping left (back) here
-              },
+              onPressed: () {},
             ),
             IconButton(
               icon: Icon(Icons.delete),
@@ -208,7 +180,6 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Profile row
               Row(
                 children: [
                   Padding(
@@ -237,7 +208,6 @@ class _HomePageState extends State<HomePage> {
                   )
                 ],
               ),
-              // Delete button
               IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
@@ -271,7 +241,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget HeadingText(String text) {
+  Widget headingText(String text) {
     return Align(
       alignment: Alignment.topLeft,
       child: Padding(
@@ -280,36 +250,6 @@ class _HomePageState extends State<HomePage> {
           text,
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-      ),
-    );
-  }
-
-  Widget searchText(String hintText) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: TextFormField(
-        decoration: InputDecoration(
-            prefixIcon: Padding(
-              padding: EdgeInsets.fromLTRB(
-                  20, 5, 5, 5), // add padding to adjust icon
-              child: Icon(
-                Icons.search,
-                color: Constants.searchGrey,
-              ),
-            ),
-            filled: true,
-            contentPadding: EdgeInsets.all(16),
-            hintText: hintText,
-            hintStyle: TextStyle(
-                color: Constants.searchGrey, fontWeight: FontWeight.w500),
-            fillColor: Color.fromARGB(247, 232, 235, 237),
-            border: OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 0,
-                  style: BorderStyle.none,
-                ),
-                borderRadius: BorderRadius.circular(20))),
-        style: TextStyle(),
       ),
     );
   }
@@ -343,62 +283,7 @@ class _HomePageState extends State<HomePage> {
         description: description,
         password: password,
       ));
+      MyApp.refreshHomePage();
     }
-  }
-
-  Widget bottomSheetWidgets(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10.0, 10, 10, 10),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 10,
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              width: screenWidth * 0.4,
-              height: 5,
-              decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 156, 156, 156),
-                  borderRadius: BorderRadius.circular(20)),
-            ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Row(
-            children: [
-              Container(
-                height: 60,
-                width: 130,
-                decoration: BoxDecoration(
-                    color: Constants.logoBackground,
-                    borderRadius: BorderRadius.circular(20)),
-                child: FractionallySizedBox(
-                  heightFactor: 0.5,
-                  widthFactor: 0.5,
-                  child: Container(
-                    child: Row(
-                      children: [
-                        Icon(Icons.add),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          "Add",
-                          style: TextStyle(fontSize: 14),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }

@@ -4,7 +4,7 @@ import 'package:password_manager/Model/password_model.dart';
 
 import 'constants.dart';
 
-class AddModal extends StatelessWidget {
+class AddModal extends StatefulWidget {
   final Function(String, String, String) onAddPassword;
 
   AddModal({
@@ -12,8 +12,15 @@ class AddModal extends StatelessWidget {
     required this.onAddPassword,
   }) : super(key: key);
 
+  @override
+  State<AddModal> createState() => _AddModalState();
+}
+
+class _AddModalState extends State<AddModal> {
   final TextEditingController usernameController = TextEditingController();
+
   final TextEditingController descriptionController = TextEditingController();
+
   final TextEditingController passwordController = TextEditingController();
 
   @override
@@ -76,11 +83,11 @@ class AddModal extends StatelessWidget {
                 final username = usernameController.text;
                 final description = descriptionController.text;
                 final password = passwordController.text;
-                // onAddPassword(username, description, password);
                 Constants.passwordData.add(passwords(
                     userName: username,
                     description: description,
                     password: password));
+                widget.onAddPassword(username, description, password);
                 Navigator.pop(context);
               },
               child: Text(
@@ -106,7 +113,7 @@ class AddModal extends StatelessWidget {
         decoration: InputDecoration(
             prefixIcon: Padding(
               padding: EdgeInsets.fromLTRB(
-                  20, 5, 5, 5), // add padding to adjust icon
+                  20, 5, 5, 5), 
               child: Icon(
                 icon,
                 color: Constants.searchGrey,
@@ -142,33 +149,5 @@ class AddModal extends StatelessWidget {
     );
   }
 
-  Widget searchText(String hintText) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: TextFormField(
-        decoration: InputDecoration(
-            prefixIcon: Padding(
-              padding: EdgeInsets.fromLTRB(
-                  20, 5, 5, 5), // add padding to adjust icon
-              child: Icon(
-                Icons.search,
-                color: Constants.searchGrey,
-              ),
-            ),
-            filled: true,
-            contentPadding: EdgeInsets.all(16),
-            hintText: hintText,
-            hintStyle: TextStyle(
-                color: Constants.searchGrey, fontWeight: FontWeight.w500),
-            fillColor: Color.fromARGB(247, 232, 235, 237),
-            border: OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 0,
-                  style: BorderStyle.none,
-                ),
-                borderRadius: BorderRadius.circular(20))),
-        style: TextStyle(),
-      ),
-    );
-  }
+
 }
