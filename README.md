@@ -1,16 +1,31 @@
 # password_manager
 
-A new Flutter project.
+Password manager built in flutter
 
-## Getting Started
+This is a demonstration of a simple password manager in flutter which uses ```sqflite``` to store passwords in persistent storage
+### Features provided are
+- Add entry
+- View all entries
+- Delete entry
 
-This project is a starting point for a Flutter application.
+This app is coded in very basic manner such that anyone with basic Flutter knowledge can play with it.
+Here is the demonstration (SS) of my Password Manager
+1.  Homepage (Without any data)
+<img src="/screenshots/web1.png"/>
+2.  Add details page
+<img src="/screenshots/web2.png"/>
+3.  Filling details (Mock data)
+<img src="/screenshots/web3.png"/>
+4.  Homepage (With filled Mock data)
+<img src="/screenshots/web4.png"/>
+5.  Homepage (Filled)
+<img src="/screenshots/web5.png"/>
+6.  Deleting a record (from left)
+<img src="/screenshots/web6.png"/>
+6.  Deleting a record (from right)
+<img src="/screenshots/web7.png"/>
+7.  View record
+<img src="/screenshots/web8.png"/>
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+If you liked my work star the repo.
