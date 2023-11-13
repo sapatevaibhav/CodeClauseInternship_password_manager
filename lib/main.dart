@@ -106,32 +106,39 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: 10,
                 ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: passwordData.length,
-                  itemBuilder: (context, index) {
-                    final password = passwordData[index];
-                    return Dismissible(
-                      key: Key(password.userName),
-                      onDismissed: (direction) {
-                        deletePassword(index);
-                      },
-                      background: Container(
-                        color: Colors.red,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(Icons.arrow_back, color: Colors.white),
-                            Icon(Icons.delete, color: Colors.white),
-                          ],
-                        ),
+                passwordData.isEmpty
+                    ? Center(heightFactor: 15,
+                        child: Text(
+                          "There isn't any entry available",
+                          style: TextStyle(fontSize: 20,color: Colors.redAccent),
+                        ))
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: passwordData.length,
+                        itemBuilder: (context, index) {
+                          final password = passwordData[index];
+                          return Dismissible(
+                            key: Key(password.userName),
+                            onDismissed: (direction) {
+                              deletePassword(index);
+                            },
+                            background: Container(
+                              color: Colors.red,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Icon(Icons.arrow_back, color: Colors.white),
+                                  Icon(Icons.delete, color: Colors.white),
+                                ],
+                              ),
+                            ),
+                            child: passwordTile(password, index, context, () {
+                              deletePassword(index);
+                            }),
+                          );
+                        },
                       ),
-                      child: passwordTile(password, index, context, () {
-                        deletePassword(index);
-                      }),
-                    );
-                  },
-                ),
               ],
             ),
           ),

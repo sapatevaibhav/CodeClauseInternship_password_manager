@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
 import 'package:flutter/material.dart';
 import 'package:password_manager/Model/password_model.dart';
-
 import 'constants.dart';
 
 class AddModal extends StatefulWidget {
@@ -18,9 +17,7 @@ class AddModal extends StatefulWidget {
 
 class _AddModalState extends State<AddModal> {
   final TextEditingController usernameController = TextEditingController();
-
   final TextEditingController descriptionController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
 
   @override
@@ -32,74 +29,98 @@ class _AddModalState extends State<AddModal> {
     passwordController.text = '';
     return Padding(
       padding: const EdgeInsets.fromLTRB(10.0, 10, 10, 10),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 10,
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              width: screenWidth * 0.4,
-              height: 5,
-              decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 156, 156, 156),
-                  borderRadius: BorderRadius.circular(20)),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: 10,
             ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Column(
-            children: [
-              formHeading("Username"),
-              formTextField("Enter Username", Icons.person, usernameController),
-              formHeading("Description"),
-              formTextField("Enter Desctiption", Icons.description,
-                  descriptionController),
-              formHeading("Password"),
-              formTextField(
-                  "Enter Password", Icons.lock_outline, passwordController)
-            ],
-          ),
-          SizedBox(
-            height: 50,
-          ),
-          Container(
-            height: screenHeight * 0.065,
-            width: screenWidth * 0.7,
-            child: ElevatedButton(
-              style: ButtonStyle(
-                  elevation: MaterialStatePropertyAll(5),
-                  shadowColor:
-                      MaterialStatePropertyAll(Constants.buttonBackground),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24.0),
-                          side: BorderSide(color: Constants.buttonBackground))),
-                  backgroundColor:
-                      MaterialStatePropertyAll(Constants.buttonBackground)),
-              onPressed: () async {
-                final username = usernameController.text;
-                final description = descriptionController.text;
-                final password = passwordController.text;
-                Constants.passwordData.add(passwords(
-                    userName: username,
-                    description: description,
-                    password: password));
-                widget.onAddPassword(username, description, password);
-                Navigator.pop(context);
-              },
-              child: Text(
-                "Ok Done",
-                style: TextStyle(fontSize: 16, color: Colors.white),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                width: screenWidth * 0.4,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 156, 156, 156),
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            height: 30,
-          ),
-        ],
+            SizedBox(
+              height: 20,
+            ),
+            Column(
+              children: [
+                formHeading("Username"),
+                formTextField(
+                    "Enter Username", Icons.person, usernameController),
+                formHeading("Description"),
+                formTextField(
+                  "Enter Description",
+                  Icons.description,
+                  descriptionController,
+                ),
+                formHeading("Password"),
+                formTextField(
+                  "Enter Password",
+                  Icons.lock_outline,
+                  passwordController,
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Container(
+              height: screenHeight * 0.06,
+              width: screenWidth * 0.3,
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  elevation: MaterialStateProperty.all(5),
+                  shadowColor:
+                      MaterialStateProperty.all(Constants.buttonBackground),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24.0),
+                      side: BorderSide(color: Constants.buttonBackground),
+                    ),
+                  ),
+                  backgroundColor:
+                      MaterialStateProperty.all(Constants.buttonBackground),
+                ),
+                onPressed: () async {
+                  final username = usernameController.text;
+                  final description = descriptionController.text;
+                  final password = passwordController.text;
+
+                  Constants.passwordData.add(
+                    passwords(
+                      userName: username,
+                      description: description,
+                      password: password,
+                    ),
+                  );
+
+                  widget.onAddPassword(username, description, password);
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  "Ok Done",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              height: 30,
+              child: Text(
+                "made by sapatevaibhav 🧡",
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -112,8 +133,7 @@ class _AddModalState extends State<AddModal> {
         controller: controller,
         decoration: InputDecoration(
             prefixIcon: Padding(
-              padding: EdgeInsets.fromLTRB(
-                  20, 5, 5, 5), 
+              padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
               child: Icon(
                 icon,
                 color: Constants.searchGrey,
@@ -148,6 +168,4 @@ class _AddModalState extends State<AddModal> {
       ),
     );
   }
-
-
 }
